@@ -1,6 +1,8 @@
 sudo: required
 dist: trusty
-os: linux
+os: 
+ - linux
+ - osx
 language: minimal
 cache:
   directories:
@@ -75,3 +77,14 @@ script:
 after_script:
     - echo $TRAVIS_COMMIT_RANGE
     - echo $TRAVIS_COMMIT_LOG
+before_deploy:
+ - "if [[ -f target/release/litecoin ]]; then mv target/release/litecoin \"target/release/litecoin-$TRAVIS_TAG-$TRAVIS_OS_NAME\"; fi"
+deploy:
+  - provider: releases
+    skip_cleanup: true
+    on:
+      tags: true
+    file_glob: true # <-- note this new field
+    file: target/release/litecoin-*  # <-- note the `-*`
+    api_token:
+      secure: 8cda1a8725a50cadfda24267c68cc324d0d497a5
